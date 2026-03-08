@@ -1,0 +1,24 @@
+[project]
+name = "vectorless-rag"
+version = "1.0.0"
+description = "Vectorless Multimodal RAG — PageIndex tree navigation with Gemini + LangChain"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    # API server
+    "fastapi>=0.115.0",
+    "uvicorn[standard]>=0.30.0",
+    "python-multipart>=0.0.12",
+    "aiofiles>=23.0.0",
+    # PDF processing
+    "pymupdf>=1.24.0",
+    # LangChain + Gemini
+    "langchain>=0.3.0",
+    "langchain-core>=0.3.0",
+    "langchain-google-genai>=2.0.0",
+    "google-generativeai>=0.8.0",
+    # Config
+    "pydantic>=2.0.0",
+    "pydantic-settings>=2.0.0",
+    "python-dotenv>=1.0.0",
+]
