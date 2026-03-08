@@ -1,0 +1,352 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1100 790" width="1100" height="790">
+<defs>
+  <filter id="sh" x="-5%" y="-5%" width="110%" height="115%">
+    <feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#00000015"/>
+  </filter>
+  <marker id="arr"  viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0,0 L10,5 L0,10z" fill="#94a3b8"/></marker>
+  <marker id="arrB" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0,0 L10,5 L0,10z" fill="#1a73e8"/></marker>
+  <marker id="arrG" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0,0 L10,5 L0,10z" fill="#1a8a4a"/></marker>
+  <marker id="arrP" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0,0 L10,5 L0,10z" fill="#6d4fc2"/></marker>
+</defs>
+
+<!-- Background -->
+<rect width="1100" height="790" fill="#f4f6f9"/>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- TITLE                                                       -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<text x="550" y="28" text-anchor="middle" font-size="17" font-weight="700"
+      fill="#1a2535" font-family="Segoe UI, system-ui, sans-serif">
+  app.py — Vectorless Multimodal RAG · System Architecture
+</text>
+<text x="550" y="46" text-anchor="middle" font-size="11" fill="#7a8fa6"
+      font-family="Consolas, monospace">
+  FastAPI · LangChain · Google Gemini · PyMuPDF · No vectors · No chunking · No OCR
+</text>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- BROWSER                                                     -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<rect x="380" y="56" width="340" height="50" rx="9" fill="white"
+      stroke="#dde3ec" stroke-width="1.5" filter="url(#sh)"/>
+<text x="550" y="77" text-anchor="middle" font-size="13" font-weight="700"
+      fill="#1a2535" font-family="Segoe UI, sans-serif">&#127760;  Browser Client</text>
+<text x="550" y="95" text-anchor="middle" font-size="10" fill="#7a8fa6"
+      font-family="Consolas, monospace">fetch() API calls &#183; Vanilla JS &#183; Light-themed SPA</text>
+
+<!-- Arrow: Browser → FastAPI -->
+<line x1="550" y1="106" x2="550" y2="126" stroke="#94a3b8" stroke-width="1.5"
+      marker-end="url(#arr)"/>
+<text x="562" y="120" font-size="9" fill="#94a3b8" font-family="Consolas, monospace">HTTP</text>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- FASTAPI BOX                                                 -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<rect x="30" y="128" width="1040" height="162" rx="10" fill="white"
+      stroke="#dde3ec" stroke-width="1.5" filter="url(#sh)"/>
+<!-- Dark header -->
+<rect x="30" y="128" width="1040" height="34" rx="10" fill="#1a2a42"/>
+<rect x="30" y="148" width="1040" height="14" fill="#1a2a42"/>
+<text x="52" y="151" font-size="13" font-weight="700" fill="white"
+      font-family="Segoe UI, sans-serif">&#9889;  FastAPI</text>
+<text x="140" y="151" font-size="11" fill="#94b8e8" font-family="Consolas, monospace">app.py</text>
+<text x="1058" y="151" text-anchor="end" font-size="10" fill="#94b8e8"
+      font-family="Consolas, monospace">uvicorn app:app --reload --port 8000</text>
+
+<!-- Middleware badge -->
+<rect x="52" y="172" width="148" height="24" rx="5"
+      fill="#e8f0fe" stroke="rgba(26,115,232,0.3)" stroke-width="1"/>
+<text x="126" y="188" text-anchor="middle" font-size="10.5" font-weight="600"
+      fill="#1a73e8" font-family="Segoe UI, sans-serif">CORSMiddleware</text>
+
+<!-- Executor badge -->
+<rect x="214" y="172" width="230" height="24" rx="5"
+      fill="#e8f4ee" stroke="rgba(26,138,74,0.3)" stroke-width="1"/>
+<text x="329" y="188" text-anchor="middle" font-size="10.5" font-weight="600"
+      fill="#1a8a4a" font-family="Segoe UI, sans-serif">ThreadPoolExecutor  max_workers=2</text>
+
+<text x="460" y="188" font-size="10" fill="#94a3b8"
+      font-family="Segoe UI, sans-serif">— non-blocking: CPU-heavy tasks run in threads</text>
+
+<!-- Endpoints label -->
+<text x="52" y="217" font-size="9" fill="#94a3b8" font-family="Consolas, monospace"
+      letter-spacing="1" font-weight="700">ENDPOINTS</text>
+
+<!-- Route pill: GET / -->
+<rect x="52" y="223" width="148" height="24" rx="4"
+      fill="#f0f9f4" stroke="rgba(26,138,74,0.3)" stroke-width="1"/>
+<text x="63" y="239" font-size="10" font-weight="700" fill="#1a8a4a"
+      font-family="Consolas, monospace">GET</text>
+<text x="91" y="239" font-size="10" fill="#1a2535"
+      font-family="Consolas, monospace">/</text>
+<text x="102" y="239" font-size="9.5" fill="#7a8fa6"
+      font-family="Segoe UI, sans-serif">&#8594; index.html</text>
+
+<!-- Route pill: GET /api/status -->
+<rect x="213" y="223" width="175" height="24" rx="4"
+      fill="#f0f9f4" stroke="rgba(26,138,74,0.3)" stroke-width="1"/>
+<text x="224" y="239" font-size="10" font-weight="700" fill="#1a8a4a"
+      font-family="Consolas, monospace">GET</text>
+<text x="252" y="239" font-size="10" fill="#1a2535"
+      font-family="Consolas, monospace">/api/status</text>
+
+<!-- Route pill: GET /api/tree -->
+<rect x="400" y="223" width="165" height="24" rx="4"
+      fill="#f0f9f4" stroke="rgba(26,138,74,0.3)" stroke-width="1"/>
+<text x="411" y="239" font-size="10" font-weight="700" fill="#1a8a4a"
+      font-family="Consolas, monospace">GET</text>
+<text x="439" y="239" font-size="10" fill="#1a2535"
+      font-family="Consolas, monospace">/api/tree</text>
+
+<!-- Route pill: POST /api/upload -->
+<rect x="578" y="223" width="205" height="24" rx="4"
+      fill="#f5f0ff" stroke="rgba(109,79,194,0.3)" stroke-width="1"/>
+<text x="589" y="239" font-size="10" font-weight="700" fill="#6d4fc2"
+      font-family="Consolas, monospace">POST</text>
+<text x="622" y="239" font-size="10" fill="#1a2535"
+      font-family="Consolas, monospace">/api/upload</text>
+<text x="714" y="239" font-size="9.5" fill="#7a8fa6"
+      font-family="Segoe UI, sans-serif">&#8594; ingest PDF</text>
+
+<!-- Route pill: POST /api/query -->
+<rect x="796" y="223" width="210" height="24" rx="4"
+      fill="#f5f0ff" stroke="rgba(109,79,194,0.3)" stroke-width="1"/>
+<text x="807" y="239" font-size="10" font-weight="700" fill="#6d4fc2"
+      font-family="Consolas, monospace">POST</text>
+<text x="840" y="239" font-size="10" fill="#1a2535"
+      font-family="Consolas, monospace">/api/query</text>
+<text x="928" y="239" font-size="9.5" fill="#7a8fa6"
+      font-family="Segoe UI, sans-serif">&#8594; {query, mode}</text>
+
+<!-- Note row -->
+<text x="52" y="272" font-size="9.5" fill="#94a3b8"
+      font-family="Segoe UI, sans-serif">
+  &#9888;  HTTPException 400 (bad input &#183; file too large) &#183; 500 (Gemini / processing error) &#183; Max upload 50 MB
+</text>
+
+<!-- Arrow: FastAPI → Pipeline (dashed blue) -->
+<line x1="550" y1="290" x2="550" y2="318" stroke="#1a73e8" stroke-width="1.8"
+      stroke-dasharray="5,2.5" marker-end="url(#arrB)"/>
+<text x="562" y="309" font-size="9" fill="#1a73e8"
+      font-family="Consolas, monospace">await loop.run_in_executor</text>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- PIPELINE                                                    -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<rect x="255" y="320" width="590" height="74" rx="9" fill="#e8f0fe"
+      stroke="rgba(26,115,232,0.35)" stroke-width="1.5" filter="url(#sh)"/>
+<text x="550" y="342" text-anchor="middle" font-size="12.5" font-weight="700"
+      fill="#1a73e8" font-family="Segoe UI, sans-serif">&#128279;  VectorlessRAGPipeline</text>
+<text x="550" y="358" text-anchor="middle" font-size="10" fill="#4b6a9b"
+      font-family="Consolas, monospace">vectorless_rag/pipeline.py  &#183;  global singleton  &#183;  shared by all requests</text>
+<text x="295" y="376" font-size="10.5" fill="#3a4a5c"
+      font-family="Consolas, monospace">.load_document(file_bytes, filename)</text>
+<text x="570" y="376" font-size="10.5" fill="#3a4a5c"
+      font-family="Consolas, monospace">.query(question, mode)</text>
+
+<!-- Arrows: Pipeline → 3 components -->
+<!-- To DocManager center ~177 -->
+<line x1="315" y1="394" x2="177" y2="428" stroke="#64748b" stroke-width="1.4"
+      marker-end="url(#arr)"/>
+<text x="208" y="419" font-size="9" fill="#64748b"
+      font-family="Segoe UI, sans-serif">.load_document()</text>
+
+<!-- To AgenticRAG center ~492 -->
+<line x1="492" y1="394" x2="492" y2="428" stroke="#1a8a4a" stroke-width="1.4"
+      marker-end="url(#arrG)"/>
+<text x="500" y="415" font-size="9" fill="#1a8a4a"
+      font-family="Segoe UI, sans-serif">mode=text</text>
+
+<!-- To VisionRAG center ~807 -->
+<line x1="705" y1="394" x2="807" y2="428" stroke="#6d4fc2" stroke-width="1.4"
+      marker-end="url(#arrP)"/>
+<text x="718" y="419" font-size="9" fill="#6d4fc2"
+      font-family="Segoe UI, sans-serif">mode=vision</text>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- DOCUMENT MANAGER                                            -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<rect x="30" y="430" width="294" height="190" rx="9" fill="white"
+      stroke="#dde3ec" stroke-width="1.5" filter="url(#sh)"/>
+<!-- Header -->
+<rect x="30" y="430" width="294" height="32" rx="9" fill="#f0f3f7"/>
+<rect x="30" y="446" width="294" height="16" fill="#f0f3f7"/>
+<text x="52" y="452" font-size="12" font-weight="700" fill="#1a2535"
+      font-family="Segoe UI, sans-serif">&#128203;  DocumentManager</text>
+<!-- Filename -->
+<text x="52" y="472" font-size="9.5" fill="#94a3b8"
+      font-family="Consolas, monospace">vectorless_rag/document_manager.py</text>
+<!-- Bullets -->
+<text x="52" y="491" font-size="10.5" fill="#3a4a5c"
+      font-family="Segoe UI, sans-serif">&#8226; PDF text extraction (PyMuPDF)</text>
+<text x="52" y="509" font-size="10.5" fill="#3a4a5c"
+      font-family="Segoe UI, sans-serif">&#8226; Tree build via Gemini (temp=0.1)</text>
+<text x="52" y="527" font-size="10.5" fill="#3a4a5c"
+      font-family="Segoe UI, sans-serif">&#8226; Page images @ 2&#215; scale (PyMuPDF)</text>
+<text x="52" y="545" font-size="10.5" fill="#3a4a5c"
+      font-family="Segoe UI, sans-serif">&#8226; SHA-256 disk cache (trees/ images/)</text>
+<text x="52" y="563" font-size="10.5" fill="#3a4a5c"
+      font-family="Segoe UI, sans-serif">&#8226; Thread-safe via threading.Lock</text>
+<!-- Output types -->
+<line x1="52" y1="574" x2="308" y2="574" stroke="#f0f3f7" stroke-width="1"/>
+<text x="52" y="587" font-size="9.5" fill="#94a3b8"
+      font-family="Consolas, monospace">pages: dict[int, str]</text>
+<text x="52" y="603" font-size="9.5" fill="#94a3b8"
+      font-family="Consolas, monospace">tree_index · tree_text</text>
+<text x="52" y="619" font-size="9.5" fill="#94a3b8"
+      font-family="Consolas, monospace">_page_image_paths: dict[int, Path]</text>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- AGENTIC RAG CHAIN                                           -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<rect x="345" y="430" width="294" height="190" rx="9" fill="white"
+      stroke="rgba(26,138,74,0.4)" stroke-width="1.5" filter="url(#sh)"/>
+<!-- Header -->
+<rect x="345" y="430" width="294" height="32" rx="9" fill="#e8f4ee"/>
+<rect x="345" y="446" width="294" height="16" fill="#e8f4ee"/>
+<text x="367" y="452" font-size="12" font-weight="700" fill="#1a8a4a"
+      font-family="Segoe UI, sans-serif">&#129504;  AgenticRAGChain</text>
+<!-- Filename -->
+<text x="367" y="472" font-size="9.5" fill="#94a3b8"
+      font-family="Consolas, monospace">chains/agentic_rag.py &#183; Runnable</text>
+<!-- Bullets -->
+<text x="367" y="491" font-size="10.5" fill="#3a4a5c"
+      font-family="Segoe UI, sans-serif">&#8226; LLM reads tree index (no body text)</text>
+<text x="367" y="509" font-size="10.5" fill="#3a4a5c"
+      font-family="Segoe UI, sans-serif">&#8226; Action: FETCH_NODE &#8594; read pages</text>
+<text x="367" y="527" font-size="10.5" fill="#3a4a5c"
+      font-family="Segoe UI, sans-serif">&#8226; Action: ANSWER &#8594; return result</text>
+<text x="367" y="545" font-size="10.5" fill="#3a4a5c"
+      font-family="Segoe UI, sans-serif">&#8226; Loops &#8804; MAX_ITERATIONS = 5</text>
+<text x="367" y="563" font-size="10.5" fill="#3a4a5c"
+      font-family="Segoe UI, sans-serif">&#8226; LangChain message history</text>
+<line x1="367" y1="574" x2="623" y2="574" stroke="#e8f4ee" stroke-width="1"/>
+<text x="367" y="587" font-size="9.5" fill="#94a3b8"
+      font-family="Consolas, monospace">steps &#183; nodes_visited &#183; sources</text>
+<text x="367" y="603" font-size="9.5" fill="#94a3b8"
+      font-family="Consolas, monospace">pages_accessed &#183; num_iterations</text>
+<text x="367" y="619" font-size="9.5" fill="#94a3b8"
+      font-family="Consolas, monospace">timing: {total_ms, per_step_ms}</text>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- VISION RAG CHAIN                                            -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<rect x="660" y="430" width="294" height="190" rx="9" fill="white"
+      stroke="rgba(109,79,194,0.4)" stroke-width="1.5" filter="url(#sh)"/>
+<!-- Header -->
+<rect x="660" y="430" width="294" height="32" rx="9" fill="#f3f0ff"/>
+<rect x="660" y="446" width="294" height="16" fill="#f3f0ff"/>
+<text x="682" y="452" font-size="12" font-weight="700" fill="#6d4fc2"
+      font-family="Segoe UI, sans-serif">&#128065;  VisionRAGChain</text>
+<!-- Filename -->
+<text x="682" y="472" font-size="9.5" fill="#94a3b8"
+      font-family="Consolas, monospace">chains/vision_rag.py &#183; Runnable</text>
+<!-- Bullets -->
+<text x="682" y="491" font-size="10.5" fill="#3a4a5c"
+      font-family="Segoe UI, sans-serif">&#8226; 1-shot tree navigation &#8594; node_ids</text>
+<text x="682" y="509" font-size="10.5" fill="#3a4a5c"
+      font-family="Segoe UI, sans-serif">&#8226; Page JPEGs &#8594; base64 encoded</text>
+<text x="682" y="527" font-size="10.5" fill="#3a4a5c"
+      font-family="Segoe UI, sans-serif">&#8226; Multimodal msg &#8594; Gemini VLM</text>
+<text x="682" y="545" font-size="10.5" fill="#3a4a5c"
+      font-family="Segoe UI, sans-serif">&#8226; No OCR — purely visual answer</text>
+<text x="682" y="563" font-size="10.5" fill="#3a4a5c"
+      font-family="Segoe UI, sans-serif">&#8226; 2 Gemini API calls total</text>
+<line x1="682" y1="574" x2="938" y2="574" stroke="#f3f0ff" stroke-width="1"/>
+<text x="682" y="587" font-size="9.5" fill="#94a3b8"
+      font-family="Consolas, monospace">answer &#183; navigation_reasoning</text>
+<text x="682" y="603" font-size="9.5" fill="#94a3b8"
+      font-family="Consolas, monospace">pages_accessed &#183; nodes_visited</text>
+<text x="682" y="619" font-size="9.5" fill="#94a3b8"
+      font-family="Consolas, monospace">timing: {nav_ms, image_ms, vision_ms}</text>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- ARROWS: Components → Bottom row                             -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- DocManager → FileCache -->
+<line x1="100" y1="620" x2="100" y2="658" stroke="#64748b" stroke-width="1.3"
+      marker-end="url(#arr)"/>
+<text x="108" y="643" font-size="8.5" fill="#64748b"
+      font-family="Segoe UI, sans-serif">cache r/w</text>
+
+<!-- DocManager → Gemini (tree build) -->
+<line x1="248" y1="620" x2="476" y2="658" stroke="#1a73e8" stroke-width="1.3"
+      stroke-dasharray="4,2.5" marker-end="url(#arrB)"/>
+<text x="315" y="645" font-size="8.5" fill="#1a73e8"
+      font-family="Segoe UI, sans-serif">tree build</text>
+
+<!-- AgenticRAG → Gemini -->
+<line x1="492" y1="620" x2="540" y2="658" stroke="#1a73e8" stroke-width="1.3"
+      stroke-dasharray="4,2.5" marker-end="url(#arrB)"/>
+<text x="500" y="643" font-size="8.5" fill="#1a73e8"
+      font-family="Segoe UI, sans-serif">text RAG</text>
+
+<!-- VisionRAG → Gemini (two calls) -->
+<line x1="807" y1="620" x2="700" y2="658" stroke="#1a73e8" stroke-width="1.3"
+      stroke-dasharray="4,2.5" marker-end="url(#arrB)"/>
+<text x="728" y="645" font-size="8.5" fill="#1a73e8"
+      font-family="Segoe UI, sans-serif">vision RAG (&#215;2)</text>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- DISK CACHE                                                  -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<rect x="30" y="660" width="228" height="100" rx="9" fill="white"
+      stroke="#dde3ec" stroke-width="1.5" filter="url(#sh)"/>
+<text x="52" y="681" font-size="12" font-weight="700" fill="#1a2535"
+      font-family="Segoe UI, sans-serif">&#128190;  Disk Cache</text>
+<text x="52" y="700" font-size="9.5" fill="#7a8fa6"
+      font-family="Consolas, monospace">data/trees/{sha256}.json</text>
+<text x="52" y="717" font-size="9.5" fill="#7a8fa6"
+      font-family="Consolas, monospace">data/images/{sha256}/page_N.jpg</text>
+<text x="52" y="735" font-size="9.5" fill="#94a3b8"
+      font-family="Segoe UI, sans-serif">Key = SHA-256(file_bytes)[:16]</text>
+<text x="52" y="752" font-size="9.5" fill="#94a3b8"
+      font-family="Segoe UI, sans-serif">Skip rebuild when hash exists</text>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- GEMINI API                                                  -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<rect x="275" y="660" width="610" height="100" rx="9" fill="#e8f0fe"
+      stroke="rgba(26,115,232,0.35)" stroke-width="1.5" filter="url(#sh)"/>
+<text x="295" y="681" font-size="12" font-weight="700" fill="#1a73e8"
+      font-family="Segoe UI, sans-serif">&#9889;  Google Gemini API</text>
+<text x="462" y="681" font-size="9.5" fill="#4b6a9b"
+      font-family="Consolas, monospace">ChatGoogleGenerativeAI  (langchain-google-genai)</text>
+<text x="295" y="700" font-size="10" fill="#1a2535"
+      font-family="Segoe UI, sans-serif">Model: gemini-3-flash-preview  (configurable via GEMINI_MODEL env var)</text>
+<text x="295" y="718" font-size="10" fill="#3a4a5c"
+      font-family="Segoe UI, sans-serif">&#8226; Tree build: first 50 pages (&#8804;100k chars) &#8594; hierarchical JSON (SystemMessage + HumanMessage)</text>
+<text x="295" y="735" font-size="10" fill="#3a4a5c"
+      font-family="Segoe UI, sans-serif">&#8226; Text RAG: multi-turn conversation loop (SystemMessage / HumanMessage / AIMessage)</text>
+<text x="295" y="752" font-size="10" fill="#3a4a5c"
+      font-family="Segoe UI, sans-serif">&#8226; Vision RAG: image_url blocks (data:image/jpeg;base64,...) — no OCR, purely visual</text>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- LEGEND                                                      -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<rect x="900" y="660" width="170" height="100" rx="9" fill="white"
+      stroke="#dde3ec" stroke-width="1.5"/>
+<text x="920" y="681" font-size="11" font-weight="700" fill="#1a2535"
+      font-family="Segoe UI, sans-serif">Legend</text>
+<!-- sync -->
+<line x1="920" y1="696" x2="950" y2="696" stroke="#64748b" stroke-width="1.5"
+      marker-end="url(#arr)"/>
+<text x="958" y="700" font-size="9.5" fill="#3a4a5c"
+      font-family="Segoe UI, sans-serif">sync call</text>
+<!-- Gemini -->
+<line x1="920" y1="714" x2="950" y2="714" stroke="#1a73e8" stroke-width="1.5"
+      stroke-dasharray="4,2" marker-end="url(#arrB)"/>
+<text x="958" y="718" font-size="9.5" fill="#3a4a5c"
+      font-family="Segoe UI, sans-serif">Gemini API</text>
+<!-- Text RAG swatch -->
+<rect x="920" y="727" width="12" height="9" rx="2"
+      fill="#e8f4ee" stroke="rgba(26,138,74,0.4)" stroke-width="1"/>
+<text x="940" y="736" font-size="9.5" fill="#3a4a5c"
+      font-family="Segoe UI, sans-serif">Text RAG</text>
+<!-- Vision RAG swatch -->
+<rect x="920" y="742" width="12" height="9" rx="2"
+      fill="#f3f0ff" stroke="rgba(109,79,194,0.4)" stroke-width="1"/>
+<text x="940" y="751" font-size="9.5" fill="#3a4a5c"
+      font-family="Segoe UI, sans-serif">Vision RAG</text>
+
+</svg>

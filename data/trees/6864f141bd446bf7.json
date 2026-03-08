@@ -1,0 +1,33 @@
+{
+  "document": {
+    "title": "A Guide to Model Context Protocol (MCP) AI Accelerator Program",
+    "description": "This document outlines the Model Context Protocol (MCP), an open standard launched by Anthropic in November 2024 designed to enable Large Language Models (LLMs) to access external data sources securely. It details the protocol's three core components\u2014Model, Context, and Protocol\u2014and explains the technical architecture involving Hosts, Clients, and Servers that facilitates real-time data retrieval from databases, APIs, and local files without custom code.",
+    "total_pages": 5,
+    "nodes": [
+      {
+        "node_id": "N001",
+        "title": "Introduction to Model Context Protocol (MCP)",
+        "start_page": 1,
+        "end_page": 2,
+        "summary": "Introduction to the MCP AI Accelerator Program. The Model Context Protocol (MCP) is an open standard launched by Anthropic in November 2024. It provides a structured, secure, and scalable framework for LLMs like Claude and GPT to access external content, including documents, databases, tools, local files, and APIs, effectively bridging the gap between models and external data sources.",
+        "sub_nodes": []
+      },
+      {
+        "node_id": "N002",
+        "title": "Core Components of MCP",
+        "start_page": 3,
+        "end_page": 3,
+        "summary": "The MCP architecture is built on three primary pillars: 1) Model, referring to the LLM (e.g., Claude or GPT-5) processing inputs; 2) Context, representing the external information required for meaningful responses (sourced from PDFs, prompts, or database entries); and 3) Protocol, the specific set of rules enabling the model to access and utilize context from structured sources.",
+        "sub_nodes": []
+      },
+      {
+        "node_id": "N003",
+        "title": "Operational Workflow and Architecture",
+        "start_page": 4,
+        "end_page": 5,
+        "summary": "MCP standardizes communication between clients and servers to eliminate custom code requirements. The architecture defines three roles: the Host (manages model permissions and user interaction), the Client (a connector maintaining a stateful session with a server), and the Server (the endpoint exposing tools, resources, and prompt templates). The workflow involves the client automatically discovering servers and requesting specific information (files, emails, or database records) to provide real-time, dynamic responses to user queries.",
+        "sub_nodes": []
+      }
+    ]
+  }
+}

@@ -1,0 +1,89 @@
+{
+  "document": {
+    "title": "SIMPLE GUIDE: Page Index vs RAG Context Retrieval Approaches",
+    "description": "This technical guide compares two primary retrieval strategies for LLM context: Page Indexing and Retrieval Augmented Generation (RAG). Page Indexing is a deterministic, structure-based approach ideal for small datasets (< few hundred pages) and slide generation, while RAG utilizes semantic similarity via vector embeddings and databases like Pinecone or FAISS for large-scale, unstructured enterprise data. The document details step-by-step workflows, infrastructure requirements, use-case suitability, and provides a comparative analysis of pros, cons, and scalability trade-offs.",
+    "total_pages": 11,
+    "nodes": [
+      {
+        "node_id": "N001",
+        "title": "Introduction and Definition of Page Index Retrieval",
+        "start_page": 1,
+        "end_page": 2,
+        "summary": "Introduces Page Indexing as a retrieval method based on document structure rather than semantic similarity. It is described as a deterministic process where the system searches a page index (e.g., Page 1 for Intro, Page 2 for Architecture), finds the relevant page, and retrieves content to be broken down slide-by-slide or section-by-section for LLM processing.",
+        "sub_nodes": []
+      },
+      {
+        "node_id": "N002",
+        "title": "How Page Index Works",
+        "start_page": 3,
+        "end_page": 3,
+        "summary": "Outlines a 4-step workflow for Page Indexing: 1) Document Parsing to extract headings and build the index; 2) User Query processing (e.g., 'Explain embeddings'); 3) Index Search to match keywords to specific pages (e.g., Page 4); and 4) Content Processing to segment retrieved data for the LLM.",
+        "sub_nodes": []
+      },
+      {
+        "node_id": "N003",
+        "title": "What is RAG?",
+        "start_page": 4,
+        "end_page": 4,
+        "summary": "Defines Retrieval Augmented Generation (RAG) as a semantic similarity search method using vector embeddings instead of page numbers. The pipeline involves chunking documents, generating embeddings, and utilizing a Vector DB to find meaningfully related content rather than exact keyword matches.",
+        "sub_nodes": []
+      },
+      {
+        "node_id": "N004",
+        "title": "How RAG Works",
+        "start_page": 5,
+        "end_page": 5,
+        "summary": "Details the 5-step RAG pipeline: 1) Chunking text; 2) Generating Embeddings (e.g., vectors like [0.23, 0.89...]); 3) Storage in Vector Databases such as Pinecone, Weaviate, FAISS, or Chroma; 4) Query Retrieval via similarity search; and 5) LLM Generation using retrieved chunks as context.",
+        "sub_nodes": []
+      },
+      {
+        "node_id": "N005",
+        "title": "Key Differences Table",
+        "start_page": 6,
+        "end_page": 6,
+        "summary": "Provides a direct comparison between Page Index and RAG. Page Index relies on keyword/page lookup, document index storage, and light infrastructure, but has limited scalability. RAG utilizes semantic similarity and vector databases, offering superior matching and high scalability at the cost of a complex embedding pipeline.",
+        "sub_nodes": []
+      },
+      {
+        "node_id": "N006",
+        "title": "When to Use Page Index",
+        "start_page": 7,
+        "end_page": 7,
+        "summary": "Identifies optimal use cases for Page Indexing: slide generators, educational content, static manuals, and small datasets (< few hundred pages). Benefits include high speed, zero embedding costs, simple architecture, and easy debugging.",
+        "sub_nodes": []
+      },
+      {
+        "node_id": "N007",
+        "title": "When to Use RAG",
+        "start_page": 8,
+        "end_page": 8,
+        "summary": "Specifies RAG use cases: enterprise assistants, customer support chatbots, large document collections (millions of docs), and unstructured data like emails or reports. Benefits include semantic search, handling ambiguous questions, and high flexibility.",
+        "sub_nodes": []
+      },
+      {
+        "node_id": "N008",
+        "title": "Pros and Cons Analysis",
+        "start_page": 9,
+        "end_page": 9,
+        "summary": "Contrasts the advantages and disadvantages of both systems. Page Index is fast and cheap but structure-dependent and poor for large data. RAG handles vague questions and large datasets but incurs embedding costs and requires infrastructure tuning.",
+        "sub_nodes": []
+      },
+      {
+        "node_id": "N009",
+        "title": "Simple Analogy: Textbook vs. Librarian",
+        "start_page": 10,
+        "end_page": 10,
+        "summary": "Uses a conceptual analogy to explain retrieval: Page Index is like a textbook index where you go directly to Page 42; RAG is like a 'Smart Librarian' who finds and synthesizes relevant paragraphs across multiple books to answer a query.",
+        "sub_nodes": []
+      },
+      {
+        "node_id": "N010",
+        "title": "Quick Summary and Recommendations",
+        "start_page": 11,
+        "end_page": 11,
+        "summary": "Concludes with a final recommendation: use Page Index for small structured documents, tutorials, and slide generation; use RAG for chatbots, large enterprise data, and semantic search. Encourages selection based on data size and structure.",
+        "sub_nodes": []
+      }
+    ]
+  }
+}

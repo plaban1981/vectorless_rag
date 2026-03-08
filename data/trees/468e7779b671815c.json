@@ -1,0 +1,71 @@
+{
+  "document": {
+    "title": "AI Accelerator Program: A Guide to Context Engineering",
+    "description": "A technical guide by Andrej Karpathy exploring context engineering as the 'memory management' of LLM-based operating systems, covering architectural components, optimization strategies for token limits (8K to 200K), and real-world applications in insurance and healthcare.",
+    "total_pages": 10,
+    "nodes": [
+      {
+        "node_id": "N001",
+        "title": "Conceptual Framework of Context Engineering",
+        "start_page": 1,
+        "end_page": 3,
+        "summary": "Andrej Karpathy defines LLMs as a new operating system where the Context Window functions as CPU RAM/working memory. Context engineering is the 'memory management' required for AI agents, RAG, and tool-using systems. The context window comprises the system prompt, user messages, conversation history, tool outputs, retrieved documents, and structured state. The core thesis (p. 3) posits that output quality is a direct function of context organization: noisy/incomplete data degrades performance, while precise/organized data enables intelligent behavior.",
+        "sub_nodes": []
+      },
+      {
+        "node_id": "N002",
+        "title": "The Importance of Context Management",
+        "start_page": 4,
+        "end_page": 6,
+        "summary": "This section outlines five critical drivers for context engineering: managing limited windows (8K, 32K, 128K, up to 200K tokens), improving reasoning via signal-to-noise optimization, reducing API costs/latency, enabling long-running agents, and preventing model confusion from raw logs. Page 5 details failure modes like 'lost instructions' and 'context overflow.' Page 6 emphasizes that token cost is proportional to context size and that memory compression is essential for state tracking and goal continuity in autonomous workflows.",
+        "sub_nodes": [
+          {
+            "node_id": "N002.1",
+            "title": "Technical Constraints and Reasoning Quality",
+            "start_page": 5,
+            "end_page": 5,
+            "summary": "Analyzes frontier model token limits (8K-200K) and the risks of context overflow, including hallucinations and forgotten goals. Contrasts 'Bad Context' (50 irrelevant messages) with 'Good Context' (structured summaries) to demonstrate improved reasoning results."
+          },
+          {
+            "node_id": "N002.2",
+            "title": "Operational Efficiency and Agent Continuity",
+            "start_page": 6,
+            "end_page": 6,
+            "summary": "Focuses on the economic and functional benefits of context engineering, specifically how reducing context leads to faster responses and lower API costs. Details the necessity of memory compression for agents running for hours or days to maintain persistent memory and state tracking."
+          }
+        ]
+      },
+      {
+        "node_id": "N003",
+        "title": "Core Methods for Context Engineering",
+        "start_page": 7,
+        "end_page": 10,
+        "summary": "Detailed strategies for managing growing conversation history and tool outputs. Methods include: 1) Summarization of History (e.g., compressing a 10-message ML pipeline discussion involving XGBoost and cross-validation into a single summary), 2) Relevance Filtering (Heuristic, Recency, and Embedding similarity), and 3) Tool Call Summarization. Page 9 highlights that raw tool outputs (Search/Logs/DB) can reach 10,000-20,000 tokens, necessitating conversion into structured summaries (e.g., 500 DB records summarized by age range and average purchase).",
+        "sub_nodes": [
+          {
+            "node_id": "N003.1",
+            "title": "Conversation History and Filtering Strategies",
+            "start_page": 7,
+            "end_page": 8,
+            "summary": "Explains the transition from raw message passing to compressed summaries. Introduces Heuristic filtering (removing greetings/acknowledgments) and Recency filtering (keeping only the last N messages) to maintain efficiency as user interactions scale."
+          },
+          {
+            "node_id": "N003.2",
+            "title": "Advanced Filtering and Tool Output Management",
+            "start_page": 9,
+            "end_page": 10,
+            "summary": "Covers Embedding similarity filtering (3-step process: convert to embeddings, compare similarity to query, filter). Addresses the 'Tool Output' problem where raw data destroys context; provides a solution for summarizing 500 customer records into key metrics (Age 18-65, Avg purchase $250) to maintain reasoning efficiency."
+          }
+        ]
+      },
+      {
+        "node_id": "N004",
+        "title": "Real-world Case Studies",
+        "start_page": 10,
+        "end_page": 10,
+        "summary": "Presents three industry applications: 1) AI Coding Assistants (Cursor, GitHub Copilot) using codebase mapping; 2) Five Sigma Insurance, which achieved an 80% reduction in claim errors and 25% increase in productivity via context-aware policy/claims ingestion; 3) Healthcare Virtual Assistants that integrate health records and medication schedules to reduce administrative overhead and ensure safe advice.",
+        "sub_nodes": []
+      }
+    ]
+  }
+}

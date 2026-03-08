@@ -1,0 +1,83 @@
+{
+  "document": {
+    "title": "Multimodal Learning",
+    "description": "This document, authored by Bouchey, Castek, and Thygeson, explores the pedagogical framework of Multimodal Learning (MML) within STEM higher education, specifically projecting its application for the year 2026. It details the transition from traditional 'factory model' text-based instruction to a student-centered approach leveraging digital technologies, Universal Design for Learning (UDL), and the X-FILEs (eXploring the Future of Innovative Learning Environments) project findings. The text analyzes five core areas\u2014content presentation, interactions, learner activities, assessment, and co-curricular integration\u2014while addressing critical factors such as accessibility for the 15% of the global population with disabilities (WHO 2011), the digital native/immigrant divide, and cognitive load theory (Sweller et al. 1998).",
+    "total_pages": 20,
+    "nodes": [
+      {
+        "node_id": "N001",
+        "title": "Section 1: Emerging Trends and Pedagogies",
+        "start_page": 1,
+        "end_page": 5,
+        "summary": "Introduces MML as a response to information proliferation and increasing student diversity (NCES). It defines MML per Sankey et al. (2010) as environments presenting elements in multiple sensory modes (visual, aural, written). The section aligns MML with the three principles of Universal Design for Learning (UDL) by Rose and Meyer (2002): multiple means of representation, action/expression, and engagement. It critiques the 'factory model' of teaching and advocates for a shift toward student agency and metacognition. The section also introduces the X-FILEs project framework which categorizes learning into five domains: content, interactions, activities, assessment, and co-curricular learning.",
+        "sub_nodes": [
+          {
+            "node_id": "N002",
+            "title": "1.1 Aspects of Teaching and Learning in MML Literature",
+            "start_page": 3,
+            "end_page": 5,
+            "summary": "Provides a literature survey across five domains. 1.1.1 Content Presentation emphasizes curated, dynamic access points (Nouri 2018). 1.1.2 Interactions focuses on multidirectional dialog with stakeholders. 1.1.3 Learner Activities highlights the shift from designer to facilitator (Tonsing-Meyer 2013). 1.1.4 Assessment advocates for modally agnostic strategies (Jewitt 2008). 1.1.5 Co-curricular learning emphasizes real-world relevancy. Section 1.3 identifies future research needs in student identity, ethical frameworks, and validation of co-curricular credentials."
+          }
+        ]
+      },
+      {
+        "node_id": "N003",
+        "title": "Section 2: Use of Multimodal Learning in 2026",
+        "start_page": 6,
+        "end_page": 17,
+        "summary": "Synthesizes X-FILEs workshop findings to envision MML in 2026. It utilizes a recurring case study of 'Juan,' a student in an 'Introduction to the Fundamentals of Science' course, to illustrate virtual reality (VR) integration, asynchronous classrooms, and avatar-based participation. The section explores the commoditization of faculty-created content and the use of augmented reality (AR) for experiential learning. It addresses the legal necessity of MML for accessibility, citing the Rehabilitation Act of 1973 and the Americans with Disabilities Act (ADA), noting that 15% of the world population has disabilities (WHO 2011).",
+        "sub_nodes": [
+          {
+            "node_id": "N004",
+            "title": "2.1 Content Presentation",
+            "start_page": 6,
+            "end_page": 8,
+            "summary": "Discusses affordances of self-directed content selection and active learning spaces. Challenges include the cost and speed of design (e.g., creating text, video, and adaptive modules for a single statistics concept). It references the ADDIE model (Analysis, Design, Development, Implementation, Evaluation) by Molenda (2003) for curating online content and suggests augmenting traditional lectures via Learning Management Systems (LMS)."
+          },
+          {
+            "node_id": "N005",
+            "title": "2.2 Interactions and Communications",
+            "start_page": 9,
+            "end_page": 11,
+            "summary": "Applies UDL principles (Gordon et al. 2014) to foster egalitarian, dialogic interactions. It addresses the 'digital native' vs. 'digital immigrant' divide (Prensky 2001; Kesharwani 2020) and the risk of technological dependency causing isolation. For Second Language (L2) learners, it cites Farias and Abraham (2017) on how multimodal texts scaffold understanding through text/image semiosis. Implementation strategies include virtual backchannels and real-time avatar interactions."
+          },
+          {
+            "node_id": "N006",
+            "title": "2.3 Learner Activities",
+            "start_page": 12,
+            "end_page": 13,
+            "summary": "Focuses on the co-construction of knowledge between faculty and students. It highlights the need for high learner agency and metacognition (Moreno and Mayer 2007). Activities in 2026 are envisioned as student-driven and mapped to learning objectives, allowing students to choose between documents, presentations, or videos. Juan's case study illustrates performing science experiments in virtual spaces or partnered physical labs."
+          },
+          {
+            "node_id": "N007",
+            "title": "2.4 Assessment",
+            "start_page": 13,
+            "end_page": 15,
+            "summary": "Proposes the CASPA model (Consume, Analyze, Scaffold, Produce, Assess) by Blum and Barger (2018) for multimedia assignments. It suggests that MML reduces cognitive load by allowing students to use familiar modes. Challenges include the difficulty of using standardized rubrics for diverse outputs and faculty cognitive load when evaluating unfamiliar modes. Juan's assessment involves 'learning captures' via digital storytelling, photos, and audio summaries of scientific theories in nature."
+          },
+          {
+            "node_id": "N008",
+            "title": "2.5 Co-curricular Activities",
+            "start_page": 16,
+            "end_page": 17,
+            "summary": "Defines co-curricular learning as experiences complementing formal classes (Stirling and Kerr 2015). It envisions external stakeholders (e.g., industry scientists) hosting weekly sessions in virtual environments. Challenges include federal credit hour definitions and the lack of private sector connections for underrepresented students. Juan's experience involves building a professional network with global scientists through the university's virtual platform."
+          }
+        ]
+      },
+      {
+        "node_id": "N009",
+        "title": "Section 3: Conclusion",
+        "start_page": 17,
+        "end_page": 18,
+        "summary": "Summarizes the inherent limitations of MML, specifically cognitive load theory (Sweller et al. 1998; Moreno and Mayer 2007), noting that excessive modes can overwhelm learners. It calls for intentional professional development to build multimodal literacies among educators. Despite costs and complexities, it concludes that MML is essential as technology reshapes learning and student demographics become increasingly diverse. Juan's final outcome is a deep understanding of science, a mentor network, and improved presentation skills."
+      },
+      {
+        "node_id": "N010",
+        "title": "References",
+        "start_page": 18,
+        "end_page": 20,
+        "summary": "A comprehensive list of 45+ academic citations supporting the document's framework. Key references include Bezemer & Kress (2016) on social semiotics, Moreno & Mayer (2007) on interactive multimodal environments, Prensky (2001) on digital natives, and the World Health Organization (2011) report on disability. It also includes legal citations like the Rehabilitation Act of 1973 and technical standards from the U.S. General Services Administration (Section 508)."
+      }
+    ]
+  }
+}

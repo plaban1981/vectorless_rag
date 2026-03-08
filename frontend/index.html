@@ -1,0 +1,931 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vectorless RAG — Gemini + PageIndex</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<style>
+:root {
+  --bg: #f4f6f9;
+  --surface: #ffffff;
+  --surface2: #f0f3f7;
+  --surface3: #e6ebf2;
+  --border: #dde3ec;
+  --border2: #c8d2df;
+  --text: #3a4a5c;
+  --text-dim: #7a8fa6;
+  --text-bright: #1a2535;
+  --gemini: #1a73e8;
+  --gemini-dim: rgba(26,115,232,0.10);
+  --green: #1a8a4a;
+  --green-dim: rgba(26,138,74,0.10);
+  --purple: #6d4fc2;
+  --purple-dim: rgba(109,79,194,0.10);
+  --amber: #b45309;
+  --red: #dc2626;
+  --mono: 'IBM Plex Mono', monospace;
+  --sans: 'IBM Plex Sans', -apple-system, sans-serif;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+html, body { height:100%; font-family:var(--sans); background:var(--bg); color:var(--text); line-height:1.6; font-size:14px; }
+
+/* ── Layout ────────────────────────────────────────────────────────────────── */
+.layout { display:grid; grid-template-rows:auto 1fr; height:100vh; overflow:hidden; }
+.main   { display:grid; grid-template-columns:340px 1fr; overflow:hidden; }
+.left   { display:flex; flex-direction:column; gap:0; border-right:1px solid var(--border); overflow-y:auto; }
+.right  { overflow-y:auto; padding:0; display:flex; flex-direction:column; gap:0; }
+
+/* ── Header ────────────────────────────────────────────────────────────────── */
+.header {
+  padding:14px 24px;
+  background:linear-gradient(135deg, #1a2a42 0%, #1e3354 100%);
+  border-bottom:1px solid var(--border);
+  display:flex; align-items:center; justify-content:space-between;
+}
+.header-title { display:flex; align-items:center; gap:10px; }
+.header-title h1 { font-size:16px; font-weight:700; color:var(--text-bright); letter-spacing:-.3px; }
+.header-title h1 .g { color:var(--gemini); }
+.header-tag {
+  font-size:10px; font-family:var(--mono); color:var(--text-dim);
+  background:var(--surface2); border:1px solid var(--border2);
+  padding:2px 8px; border-radius:4px;
+}
+.header-badges { display:flex; gap:6px; }
+.badge {
+  font-size:10px; font-family:var(--mono); font-weight:500;
+  padding:3px 8px; border-radius:4px; border:1px solid;
+}
+.badge-gemini  { color:var(--gemini);  border-color:rgba(66,133,244,.3);  background:var(--gemini-dim); }
+.badge-lc      { color:var(--green);   border-color:rgba(61,220,132,.3);   background:var(--green-dim); }
+.badge-vision  { color:var(--purple);  border-color:rgba(167,139,250,.3);  background:var(--purple-dim); }
+
+/* ── Panels ────────────────────────────────────────────────────────────────── */
+.panel { padding:20px; border-bottom:1px solid var(--border); }
+.panel-title {
+  font-size:10px; font-weight:600; letter-spacing:.08em; text-transform:uppercase;
+  color:var(--text-dim); margin-bottom:14px;
+}
+
+/* ── Upload zone ───────────────────────────────────────────────────────────── */
+.drop-zone {
+  border:1.5px dashed var(--border2); border-radius:8px;
+  padding:24px 16px; text-align:center; cursor:pointer;
+  transition:all .2s; color:var(--text-dim); font-size:13px;
+  background:var(--surface);
+}
+.drop-zone:hover, .drop-zone.drag-over {
+  border-color:var(--gemini); background:var(--gemini-dim); color:var(--text);
+}
+.drop-zone .dz-icon { font-size:28px; margin-bottom:8px; }
+.drop-zone p { margin:4px 0; }
+.drop-zone small { font-size:11px; color:var(--text-dim); }
+#file-input { display:none; }
+
+.doc-meta {
+  margin-top:12px; padding:10px 12px; border-radius:6px;
+  background:var(--surface2); border:1px solid var(--border);
+  font-size:12px; font-family:var(--mono); display:none;
+}
+.doc-meta .doc-name { color:var(--text-bright); font-weight:500; margin-bottom:4px; word-break:break-all; }
+.doc-meta .doc-stats { color:var(--text-dim); display:flex; gap:12px; flex-wrap:wrap; }
+.doc-meta .doc-stat span { color:var(--green); }
+
+/* ── Upload progress ───────────────────────────────────────────────────────── */
+.upload-overlay {
+  display:none; position:fixed; inset:0;
+  background:rgba(20,35,60,.55); z-index:100;
+  justify-content:center; align-items:center;
+}
+.upload-overlay.active { display:flex; }
+.upload-modal {
+  background:var(--surface); border:1px solid var(--border2); border-radius:12px;
+  padding:32px 40px; text-align:center; max-width:380px; width:90%;
+}
+.upload-modal h3 { color:var(--text-bright); margin-bottom:8px; }
+.upload-modal p  { color:var(--text-dim); font-size:13px; }
+.spinner {
+  width:36px; height:36px; border:3px solid var(--border2);
+  border-top-color:var(--gemini); border-radius:50%;
+  margin:20px auto; animation:spin .8s linear infinite;
+}
+@keyframes spin { to { transform:rotate(360deg); } }
+.upload-steps { margin-top:16px; text-align:left; }
+.upload-step {
+  padding:6px 0; font-size:12px; font-family:var(--mono);
+  color:var(--text-dim); display:flex; align-items:center; gap:8px;
+}
+.upload-step.active { color:var(--text-bright); }
+.upload-step.done   { color:var(--green); }
+
+/* ── Mode selector ─────────────────────────────────────────────────────────── */
+.mode-selector { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:14px; }
+.mode-btn {
+  padding:10px 8px; border-radius:7px; border:1.5px solid var(--border2);
+  background:var(--surface); color:var(--text-dim); cursor:pointer;
+  font-family:var(--sans); font-size:12px; font-weight:500;
+  text-align:center; transition:all .2s; line-height:1.4;
+}
+.mode-btn .mode-icon { font-size:18px; display:block; margin-bottom:4px; }
+.mode-btn .mode-label { font-weight:600; display:block; }
+.mode-btn .mode-desc  { font-size:10px; color:var(--text-dim); display:block; margin-top:2px; }
+.mode-btn:hover { border-color:var(--border2); background:var(--surface2); }
+.mode-btn.active[data-mode="text"]   {
+  border-color:var(--green); background:var(--green-dim);
+  color:var(--text-bright);
+}
+.mode-btn.active[data-mode="text"] .mode-desc { color:var(--green); }
+.mode-btn.active[data-mode="vision"] {
+  border-color:var(--purple); background:var(--purple-dim);
+  color:var(--text-bright);
+}
+.mode-btn.active[data-mode="vision"] .mode-desc { color:var(--purple); }
+
+/* ── Query input ───────────────────────────────────────────────────────────── */
+.query-wrap { position:relative; }
+textarea#query-input {
+  width:100%; min-height:90px; resize:vertical;
+  background:var(--surface); border:1.5px solid var(--border2);
+  border-radius:8px; padding:12px; color:var(--text);
+  font-family:var(--sans); font-size:13px; line-height:1.5;
+  outline:none; transition:border-color .2s;
+}
+textarea#query-input:focus { border-color:var(--gemini); }
+textarea#query-input::placeholder { color:var(--text-dim); }
+.query-hint { font-size:11px; color:var(--text-dim); margin-top:6px; }
+#query-btn {
+  width:100%; margin-top:12px; padding:11px;
+  background:var(--gemini); color:#fff; border:none; border-radius:8px;
+  font-family:var(--sans); font-size:13px; font-weight:600; cursor:pointer;
+  transition:filter .2s; display:flex; align-items:center; justify-content:center; gap:8px;
+}
+#query-btn:hover:not(:disabled) { filter:brightness(1.12); }
+#query-btn:disabled { opacity:.5; cursor:not-allowed; }
+#query-btn .btn-icon { font-size:16px; }
+
+/* ── Sample queries ────────────────────────────────────────────────────────── */
+.samples-panel { padding:16px 20px; border-bottom:1px solid var(--border); }
+.sample-list { display:flex; flex-direction:column; gap:6px; }
+.sample-q {
+  font-size:12px; color:var(--text-dim); cursor:pointer;
+  padding:6px 8px; border-radius:5px; border:1px solid transparent;
+  transition:all .15s; display:flex; align-items:flex-start; gap:6px;
+}
+.sample-q:hover { background:var(--surface2); border-color:var(--border); color:var(--text); }
+.sample-q::before { content:"›"; color:var(--text-dim); flex-shrink:0; }
+
+/* ── Right panel cards ─────────────────────────────────────────────────────── */
+.card {
+  background:var(--surface); border:1px solid var(--border);
+  border-radius:10px; overflow:hidden;
+}
+.card-head {
+  padding:12px 16px; border-bottom:1px solid var(--border);
+  display:flex; align-items:center; justify-content:space-between;
+  background:var(--surface2);
+}
+.card-title { font-size:11px; font-weight:600; letter-spacing:.07em; text-transform:uppercase; }
+.card-title.green  { color:var(--green); }
+.card-title.purple { color:var(--purple); }
+.card-title.gemini { color:var(--gemini); }
+.card-body { padding:16px; }
+
+/* ── Answer markdown ───────────────────────────────────────────────────────── */
+#answer-text { font-size:14px; color:var(--text-bright); line-height:1.8; word-break:break-word; }
+#answer-text h1,#answer-text h2,#answer-text h3,
+#answer-text h4,#answer-text h5,#answer-text h6 {
+  color:var(--text-bright); font-weight:700; margin:1.1em 0 .4em;
+  line-height:1.3;
+}
+#answer-text h1 { font-size:1.35em; border-bottom:1px solid var(--border); padding-bottom:.3em; }
+#answer-text h2 { font-size:1.18em; border-bottom:1px solid var(--border); padding-bottom:.25em; }
+#answer-text h3 { font-size:1.05em; }
+#answer-text h4,#answer-text h5,#answer-text h6 { font-size:.95em; color:var(--text); }
+#answer-text p  { margin:.6em 0; }
+#answer-text p:first-child { margin-top:0; }
+#answer-text p:last-child  { margin-bottom:0; }
+#answer-text ul,#answer-text ol { margin:.5em 0 .5em 1.4em; padding:0; }
+#answer-text li { margin:.25em 0; line-height:1.7; }
+#answer-text li > ul,#answer-text li > ol { margin:.2em 0 .2em 1.2em; }
+#answer-text strong { color:var(--text-bright); font-weight:600; }
+#answer-text em     { font-style:italic; color:var(--text); }
+#answer-text code {
+  font-family:var(--mono); font-size:.88em;
+  background:var(--surface3); border:1px solid var(--border);
+  padding:1px 5px; border-radius:4px; color:var(--gemini);
+}
+#answer-text pre {
+  background:var(--surface2); border:1px solid var(--border);
+  border-radius:7px; padding:14px 16px; overflow-x:auto; margin:.8em 0;
+}
+#answer-text pre code {
+  background:none; border:none; padding:0; color:var(--text);
+  font-size:.85em; line-height:1.6;
+}
+#answer-text blockquote {
+  border-left:3px solid var(--gemini); margin:.7em 0;
+  padding:.4em .8em; background:var(--gemini-dim); border-radius:0 5px 5px 0;
+  color:var(--text);
+}
+#answer-text hr { border:none; border-top:1px solid var(--border); margin:1em 0; }
+#answer-text table { border-collapse:collapse; width:100%; margin:.8em 0; font-size:13px; }
+#answer-text th,#answer-text td {
+  border:1px solid var(--border); padding:7px 12px; text-align:left;
+}
+#answer-text th {
+  background:var(--surface2); font-weight:600; color:var(--text-bright);
+}
+#answer-text tr:nth-child(even) td { background:var(--surface2); }
+#answer-text a { color:var(--gemini); text-decoration:underline; }
+
+/* ── Reasoning steps ───────────────────────────────────────────────────────── */
+.step-list { display:flex; flex-direction:column; gap:8px; }
+.step {
+  border:1px solid var(--border); border-radius:7px; overflow:hidden;
+  animation:fade-in .3s ease forwards;
+}
+@keyframes fade-in { from { opacity:0; transform:translateY(4px); } to { opacity:1; transform:none; } }
+.step-head {
+  display:flex; align-items:center; gap:10px; padding:9px 12px;
+  cursor:pointer; user-select:none;
+  transition:background .15s;
+}
+.step-head:hover { background:var(--surface2); }
+.step-icon { font-size:14px; flex-shrink:0; }
+.step-label { font-size:12px; font-weight:600; flex:1; color:var(--text-bright); }
+.step-sub   { font-size:11px; font-family:var(--mono); color:var(--text-dim); }
+.step-time  { font-size:10px; font-family:var(--mono); color:var(--text-dim); }
+.step-body  { padding:10px 12px; border-top:1px solid var(--border); font-size:12px; color:var(--text-dim); display:none; }
+.step-body.open { display:block; }
+.step-reasoning { margin-bottom:6px; line-height:1.5; }
+.step-sources { font-family:var(--mono); font-size:11px; color:var(--green); }
+
+.step[data-action="FETCH_NODE"] .step-head { background: rgba(26,115,232,.07); }
+.step[data-action="ANSWER"]     .step-head { background: var(--green-dim); }
+.step[data-action="FORCED_ANSWER"] .step-head { background:rgba(180,83,9,.08); }
+.step[data-action="ERROR"]      .step-head { background:rgba(220,38,38,.07); }
+
+/* ── Metadata bar ──────────────────────────────────────────────────────────── */
+.meta-bar {
+  display:flex; flex-wrap:wrap; gap:10px; align-items:center;
+  font-size:11px; font-family:var(--mono);
+}
+.meta-item { display:flex; align-items:center; gap:5px; color:var(--text-dim); }
+.meta-item .meta-val { color:var(--text-bright); }
+.meta-item .meta-pages {
+  display:flex; flex-wrap:wrap; gap:3px;
+}
+.page-chip {
+  background:var(--surface3); border:1px solid var(--border2);
+  border-radius:3px; padding:1px 5px; font-size:10px; color:var(--text-bright);
+}
+
+/* ── Right panel tabs ──────────────────────────────────────────────────────── */
+.right-tabs {
+  display:flex; gap:4px; border-bottom:1px solid var(--border);
+  padding:0 24px; background:var(--surface); flex-shrink:0;
+}
+.rtab {
+  padding:10px 16px; font-size:12px; font-weight:600; cursor:pointer;
+  border:none; background:none; color:var(--text-dim); font-family:var(--sans);
+  border-bottom:2px solid transparent; margin-bottom:-1px; transition:all .15s;
+}
+.rtab:hover { color:var(--text); }
+.rtab.active { color:var(--gemini); border-bottom-color:var(--gemini); }
+
+/* ── Tree panel ────────────────────────────────────────────────────────────── */
+.tree-panel { display:none; flex-direction:column; gap:0; }
+.tree-panel.active { display:flex; }
+.results-panel { display:flex; flex-direction:column; gap:16px; }
+.results-panel.hidden { display:none; }
+
+.tree-doc-title {
+  font-size:15px; font-weight:700; color:var(--text-bright); margin-bottom:4px;
+}
+.tree-doc-desc {
+  font-size:12px; color:var(--text-dim); line-height:1.5; margin-bottom:16px;
+}
+.tree-nodes { display:flex; flex-direction:column; gap:6px; }
+.tree-node {
+  border:1px solid var(--border); border-radius:8px; overflow:hidden;
+  background:var(--surface);
+}
+.tree-node-head {
+  display:flex; align-items:flex-start; gap:10px; padding:10px 14px;
+  cursor:pointer; user-select:none; transition:background .15s;
+}
+.tree-node-head:hover { background:var(--surface2); }
+.tree-node-toggle { color:var(--text-dim); font-size:11px; margin-top:2px; flex-shrink:0; width:12px; }
+.tree-node-id {
+  font-size:10px; font-family:var(--mono); font-weight:600;
+  color:var(--gemini); background:var(--gemini-dim);
+  border:1px solid rgba(26,115,232,.2); border-radius:3px;
+  padding:1px 6px; flex-shrink:0; margin-top:1px;
+}
+.tree-node-info { flex:1; min-width:0; }
+.tree-node-title { font-size:13px; font-weight:600; color:var(--text-bright); }
+.tree-node-pages { font-size:11px; font-family:var(--mono); color:var(--text-dim); margin-top:2px; }
+.tree-node-body {
+  padding:10px 14px 12px 36px;
+  border-top:1px solid var(--border);
+  background:var(--surface2);
+  display:none;
+}
+.tree-node-body.open { display:block; }
+.tree-node-summary { font-size:12px; color:var(--text); line-height:1.6; margin-bottom:8px; }
+.tree-subnodes { display:flex; flex-direction:column; gap:5px; margin-top:8px; }
+.tree-subnode {
+  border:1px solid var(--border2); border-radius:6px;
+  background:var(--surface); overflow:hidden;
+}
+.tree-subnode-head {
+  display:flex; align-items:flex-start; gap:8px; padding:8px 12px;
+  cursor:pointer; transition:background .15s;
+}
+.tree-subnode-head:hover { background:var(--surface3); }
+.tree-subnode-body {
+  padding:8px 12px 10px 28px; border-top:1px solid var(--border2);
+  background:var(--surface2); display:none;
+  font-size:12px; color:var(--text); line-height:1.6;
+}
+.tree-subnode-body.open { display:block; }
+
+/* ── Empty / loading ───────────────────────────────────────────────────────── */
+.empty-state {
+  flex:1; display:flex; flex-direction:column;
+  align-items:center; justify-content:center;
+  color:var(--text-dim); text-align:center; gap:12px; padding:40px;
+}
+.empty-icon { font-size:48px; opacity:.4; }
+.empty-title { font-size:16px; font-weight:500; color:var(--text); }
+.empty-sub   { font-size:13px; max-width:320px; line-height:1.6; }
+
+.query-loading {
+  display:none; align-items:center; gap:12px;
+  padding:20px; color:var(--text-dim); font-size:13px;
+}
+.query-loading.active { display:flex; }
+
+/* ── Error ─────────────────────────────────────────────────────────────────── */
+.error-card {
+  background:rgba(220,38,38,.07); border:1px solid rgba(220,38,38,.25);
+  border-radius:8px; padding:14px 16px; color:var(--red); font-size:13px;
+}
+
+/* ── Scrollbar ─────────────────────────────────────────────────────────────── */
+::-webkit-scrollbar { width:5px; height:5px; }
+::-webkit-scrollbar-track { background:transparent; }
+::-webkit-scrollbar-thumb { background:var(--border2); border-radius:3px; }
+</style>
+</head>
+<body>
+
+<div class="layout">
+
+  <!-- ── Header ─────────────────────────────────────────────────────────── -->
+  <header class="header">
+    <div class="header-title">
+      <h1>Vectorless <span class="g">RAG</span></h1>
+      <span class="header-tag">No vectors · No chunking · No OCR</span>
+    </div>
+    <div class="header-badges">
+      <span class="badge badge-gemini">Gemini</span>
+      <span class="badge badge-lc">LangChain</span>
+      <span class="badge badge-vision">PageIndex</span>
+    </div>
+  </header>
+
+  <div class="main">
+
+    <!-- ── Left sidebar ──────────────────────────────────────────────────── -->
+    <div class="left">
+
+      <!-- Document upload -->
+      <div class="panel">
+        <div class="panel-title">Document</div>
+        <div class="drop-zone" id="drop-zone">
+          <div class="dz-icon">📄</div>
+          <p>Drop a PDF here</p>
+          <p>or <strong>click to browse</strong></p>
+          <small>Max 50 MB · Text + Vision modes</small>
+        </div>
+        <input type="file" id="file-input" accept=".pdf">
+        <div class="doc-meta" id="doc-meta">
+          <div class="doc-name" id="doc-name"></div>
+          <div class="doc-stats">
+            <div class="doc-stat">Pages: <span id="doc-pages">–</span></div>
+            <div class="doc-stat">Nodes: <span id="doc-nodes">–</span></div>
+            <div class="doc-stat">Built: <span id="doc-time">–</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Query -->
+      <div class="panel">
+        <div class="panel-title">Query Mode</div>
+        <div class="mode-selector">
+          <button class="mode-btn active" data-mode="text">
+            <span class="mode-icon">🧠</span>
+            <span class="mode-label">Text RAG</span>
+            <span class="mode-desc">Agentic · Multi-hop</span>
+          </button>
+          <button class="mode-btn" data-mode="vision">
+            <span class="mode-icon">👁</span>
+            <span class="mode-label">Vision RAG</span>
+            <span class="mode-desc">Multimodal · No OCR</span>
+          </button>
+        </div>
+        <div class="query-wrap">
+          <textarea id="query-input" placeholder="Ask anything about your document…"></textarea>
+        </div>
+        <div class="query-hint">Ctrl + Enter to submit</div>
+        <button id="query-btn" disabled>
+          <span class="btn-icon">✦</span> Ask Gemini
+        </button>
+      </div>
+
+      <!-- Sample queries (shown after doc load) -->
+      <div class="samples-panel" id="samples-panel" style="display:none">
+        <div class="panel-title">Sample Questions</div>
+        <div class="sample-list" id="sample-list"></div>
+      </div>
+
+    </div><!-- /left -->
+
+    <!-- ── Right panel ────────────────────────────────────────────────────── -->
+    <div class="right" id="right" style="padding:0;gap:0;">
+
+      <!-- Tabs -->
+      <div class="right-tabs" id="right-tabs" style="display:none">
+        <button class="rtab active" data-tab="results" onclick="switchTab('results')">Results</button>
+        <button class="rtab" data-tab="tree" onclick="switchTab('tree')">Document Tree</button>
+      </div>
+
+      <!-- Results panel -->
+      <div class="results-panel" id="results-panel" style="padding:24px">
+
+      <!-- Empty state -->
+      <div class="empty-state" id="empty-state">
+        <div class="empty-icon">🌳</div>
+        <div class="empty-title">Reasoning-Based Document Intelligence</div>
+        <div class="empty-sub">
+          Upload a PDF to build a hierarchical tree index.<br>
+          Then ask questions — Gemini navigates the tree to find the exact answer,
+          with a full audit trail of every reasoning step.
+        </div>
+      </div>
+
+      <!-- Query loading indicator -->
+      <div class="query-loading" id="query-loading">
+        <div class="spinner" style="width:20px;height:20px;margin:0;border-width:2px;"></div>
+        <span id="loading-msg">Navigating document tree…</span>
+      </div>
+
+      <!-- Error -->
+      <div class="error-card" id="error-card" style="display:none"></div>
+
+      <!-- Answer -->
+      <div class="card" id="answer-card" style="display:none">
+        <div class="card-head">
+          <span class="card-title gemini" id="answer-title">Answer</span>
+          <span id="answer-mode-badge" class="badge"></span>
+        </div>
+        <div class="card-body">
+          <div id="answer-text"></div>
+        </div>
+      </div>
+
+      <!-- Reasoning steps (text mode) -->
+      <div class="card" id="steps-card" style="display:none">
+        <div class="card-head">
+          <span class="card-title green">Reasoning Trail</span>
+          <span id="steps-count" style="font-size:11px;color:var(--text-dim);font-family:var(--mono)"></span>
+        </div>
+        <div class="card-body">
+          <div class="step-list" id="step-list"></div>
+        </div>
+      </div>
+
+      <!-- Metadata (pages, timing, nodes) -->
+      <div class="card" id="meta-card" style="display:none">
+        <div class="card-head">
+          <span class="card-title" style="color:var(--text-dim)">Retrieval Metadata</span>
+        </div>
+        <div class="card-body">
+          <div class="meta-bar" id="meta-bar"></div>
+        </div>
+      </div>
+
+      </div><!-- /results-panel -->
+
+      <!-- Tree panel -->
+      <div class="tree-panel" id="tree-panel" style="padding:24px">
+        <div id="tree-empty" style="color:var(--text-dim);font-size:13px;padding:20px 0">
+          Load a document to view its tree index.
+        </div>
+        <div id="tree-content" style="display:none">
+          <div class="tree-doc-title" id="tree-title"></div>
+          <div class="tree-doc-desc" id="tree-desc"></div>
+          <div class="tree-nodes" id="tree-nodes"></div>
+        </div>
+      </div><!-- /tree-panel -->
+
+    </div><!-- /right -->
+  </div><!-- /main -->
+</div><!-- /layout -->
+
+<!-- Upload overlay -->
+<div class="upload-overlay" id="upload-overlay">
+  <div class="upload-modal">
+    <div class="spinner"></div>
+    <h3>Processing Document</h3>
+    <p>Gemini is reading and indexing your PDF</p>
+    <div class="upload-steps">
+      <div class="upload-step active" id="us1">⟳ Extracting text from pages…</div>
+      <div class="upload-step" id="us2">⟳ Building hierarchical tree index…</div>
+      <div class="upload-step" id="us3">⟳ Rendering page images…</div>
+    </div>
+  </div>
+</div>
+
+<script>
+// Configure marked
+marked.setOptions({ breaks: true, gfm: true });
+
+const API = '';
+let currentMode = 'text';
+let hasDoc = false;
+
+// ── Element refs ────────────────────────────────────────────────────────────
+const dropZone   = document.getElementById('drop-zone');
+const fileInput  = document.getElementById('file-input');
+const docMeta    = document.getElementById('doc-meta');
+const queryInput = document.getElementById('query-input');
+const queryBtn   = document.getElementById('query-btn');
+const emptyState = document.getElementById('empty-state');
+const queryLoad  = document.getElementById('query-loading');
+const loadMsg    = document.getElementById('loading-msg');
+const errorCard  = document.getElementById('error-card');
+const answerCard = document.getElementById('answer-card');
+const stepsCard  = document.getElementById('steps-card');
+const metaCard   = document.getElementById('meta-card');
+const stepList   = document.getElementById('step-list');
+const answerText = document.getElementById('answer-text');
+const metaBar    = document.getElementById('meta-bar');
+
+// ── Upload ──────────────────────────────────────────────────────────────────
+dropZone.addEventListener('click', () => fileInput.click());
+dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('drag-over'); });
+dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
+dropZone.addEventListener('drop', e => {
+  e.preventDefault();
+  dropZone.classList.remove('drag-over');
+  const file = e.dataTransfer.files[0];
+  if (file) uploadFile(file);
+});
+fileInput.addEventListener('change', () => { if (fileInput.files[0]) uploadFile(fileInput.files[0]); });
+
+async function uploadFile(file) {
+  if (!file.name.toLowerCase().endsWith('.pdf')) {
+    showError('Only PDF files are supported.');
+    return;
+  }
+
+  const overlay = document.getElementById('upload-overlay');
+  overlay.classList.add('active');
+
+  // Animate steps
+  const steps = [document.getElementById('us1'), document.getElementById('us2'), document.getElementById('us3')];
+  steps.forEach(s => { s.classList.remove('active','done'); });
+  steps[0].classList.add('active');
+
+  let stepIdx = 0;
+  const stepTimer = setInterval(() => {
+    if (stepIdx < steps.length - 1) {
+      steps[stepIdx].textContent = steps[stepIdx].textContent.replace('⟳','✓');
+      steps[stepIdx].classList.remove('active'); steps[stepIdx].classList.add('done');
+      stepIdx++;
+      steps[stepIdx].classList.add('active');
+    }
+  }, 8000);
+
+  try {
+    const fd = new FormData();
+    fd.append('file', file);
+    const res = await fetch(`${API}/api/upload`, { method:'POST', body:fd });
+    clearInterval(stepTimer);
+    overlay.classList.remove('active');
+
+    if (!res.ok) { const e = await res.json(); showError(e.detail || 'Upload failed.'); return; }
+    const data = await res.json();
+    showDocMeta(data);
+    hasDoc = true;
+    queryBtn.disabled = false;
+    emptyState.style.display = 'none';
+    hideResults();
+    addSampleQuestions();
+  } catch(e) {
+    clearInterval(stepTimer);
+    overlay.classList.remove('active');
+    showError('Upload failed: ' + e.message);
+  }
+}
+
+function showDocMeta(data) {
+  document.getElementById('doc-name').textContent = data.document_name;
+  document.getElementById('doc-pages').textContent = data.total_pages;
+  document.getElementById('doc-nodes').textContent = data.tree_nodes;
+  document.getElementById('doc-time').textContent = (data.timing.total_ms / 1000).toFixed(1) + 's';
+  docMeta.style.display = 'block';
+  document.getElementById('right-tabs').style.display = 'flex';
+  // Reset tree so it reloads for the new document
+  document.getElementById('tree-content').style.display = 'none';
+  document.getElementById('tree-empty').style.display = 'block';
+  document.getElementById('tree-nodes').innerHTML = '';
+}
+
+// ── Mode selector ───────────────────────────────────────────────────────────
+document.querySelectorAll('.mode-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    currentMode = btn.dataset.mode;
+    hideResults();
+  });
+});
+
+// ── Query ───────────────────────────────────────────────────────────────────
+queryBtn.addEventListener('click', runQuery);
+queryInput.addEventListener('keydown', e => { if (e.key === 'Enter' && e.ctrlKey) runQuery(); });
+
+async function runQuery() {
+  const q = queryInput.value.trim();
+  if (!q || !hasDoc) return;
+
+  hideResults();
+  hideError();
+  emptyState.style.display = 'none';
+  loadMsg.textContent = currentMode === 'vision'
+    ? 'Navigating tree → loading page images → Gemini vision…'
+    : 'Navigating document tree (multi-hop)…';
+  queryLoad.classList.add('active');
+  queryBtn.disabled = true;
+
+  try {
+    const res = await fetch(`${API}/api/query`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ query: q, mode: currentMode }),
+    });
+    queryLoad.classList.remove('active');
+    queryBtn.disabled = false;
+
+    if (!res.ok) { const e = await res.json(); showError(e.detail || 'Query failed.'); return; }
+    const data = await res.json();
+    renderResults(data);
+  } catch(e) {
+    queryLoad.classList.remove('active');
+    queryBtn.disabled = false;
+    showError('Query failed: ' + e.message);
+  }
+}
+
+// ── Render results ──────────────────────────────────────────────────────────
+function renderResults(data) {
+  // Answer
+  answerCard.style.display = 'block';
+  answerText.innerHTML = marked.parse(data.answer || '*(no answer)*');
+  const modeBadge = document.getElementById('answer-mode-badge');
+  if (data.mode === 'vision') {
+    modeBadge.textContent = '👁 Vision RAG';
+    modeBadge.className = 'badge badge-vision';
+    document.getElementById('answer-title').textContent = 'Visual Answer';
+  } else {
+    modeBadge.textContent = '🧠 Text RAG';
+    modeBadge.className = 'badge badge-lc';
+    document.getElementById('answer-title').textContent = 'Answer';
+  }
+
+  // Reasoning steps (text mode)
+  if (data.steps && data.steps.length) {
+    renderSteps(data.steps);
+    stepsCard.style.display = 'block';
+    document.getElementById('steps-count').textContent =
+      `${data.num_iterations} iteration${data.num_iterations !== 1 ? 's' : ''}`;
+  }
+
+  // Navigation reasoning (vision mode)
+  if (data.navigation_reasoning && !data.steps) {
+    stepList.innerHTML = `
+      <div class="step" data-action="FETCH_NODE">
+        <div class="step-head">
+          <span class="step-icon">🗺</span>
+          <span class="step-label">Tree Navigation</span>
+        </div>
+        <div class="step-body open">
+          <div class="step-reasoning">${esc(data.navigation_reasoning)}</div>
+        </div>
+      </div>`;
+    stepsCard.style.display = 'block';
+    document.getElementById('steps-count').textContent = '1 navigation step';
+  }
+
+  // Metadata
+  renderMeta(data);
+  metaCard.style.display = 'block';
+}
+
+function renderSteps(steps) {
+  stepList.innerHTML = '';
+  const icons = { FETCH_NODE:'🔍', ANSWER:'✅', FORCED_ANSWER:'⚠️', ERROR:'❌' };
+  const labels = { FETCH_NODE:'Fetch Node', ANSWER:'Final Answer', FORCED_ANSWER:'Forced Answer', ERROR:'Node Not Found' };
+
+  steps.forEach((s, i) => {
+    const div = document.createElement('div');
+    div.className = 'step';
+    div.dataset.action = s.action;
+    div.style.animationDelay = (i * 60) + 'ms';
+
+    let sub = '';
+    if (s.action === 'FETCH_NODE') sub = `[${s.node_id}] ${s.node_title} · pages ${s.pages}`;
+    if (s.action === 'ANSWER' && s.sources?.length) sub = s.sources.join(', ');
+
+    let bodyHtml = '';
+    if (s.reasoning) bodyHtml += `<div class="step-reasoning">${esc(s.reasoning)}</div>`;
+    if (s.sources?.length) bodyHtml += `<div class="step-sources">Sources: ${esc(s.sources.join(' · '))}</div>`;
+    if (s.detail)   bodyHtml += `<div style="color:var(--red)">${esc(s.detail)}</div>`;
+
+    div.innerHTML = `
+      <div class="step-head" onclick="toggleStep(this)">
+        <span class="step-icon">${icons[s.action] || '•'}</span>
+        <div style="flex:1;min-width:0">
+          <div class="step-label">Step ${s.step}: ${labels[s.action] || s.action}</div>
+          ${sub ? `<div class="step-sub">${esc(sub)}</div>` : ''}
+        </div>
+        <span class="step-time">${s.duration_ms || 0}ms</span>
+      </div>
+      ${bodyHtml ? `<div class="step-body">${bodyHtml}</div>` : ''}`;
+    stepList.appendChild(div);
+  });
+}
+
+function toggleStep(head) {
+  const body = head.nextElementSibling;
+  if (body && body.classList.contains('step-body')) body.classList.toggle('open');
+}
+
+function renderMeta(data) {
+  const pages = data.pages_accessed || [];
+  const nodes = data.nodes_visited || [];
+  const timing = data.timing || {};
+
+  const pageChips = pages.map(p => `<span class="page-chip">${p}</span>`).join('');
+  const totalMs = timing.total_ms || 0;
+
+  metaBar.innerHTML = `
+    ${pages.length ? `<div class="meta-item">📄 Pages: <span class="meta-pages">${pageChips}</span></div>` : ''}
+    ${nodes.length ? `<div class="meta-item">🌳 Nodes: <span class="meta-val">${esc(nodes.join(', '))}</span></div>` : ''}
+    <div class="meta-item">⏱ Total: <span class="meta-val">${totalMs}ms</span></div>
+    ${timing.navigation_ms ? `<div class="meta-item">🗺 Nav: <span class="meta-val">${timing.navigation_ms}ms</span></div>` : ''}
+    ${timing.vision_ms ? `<div class="meta-item">👁 Vision: <span class="meta-val">${timing.vision_ms}ms</span></div>` : ''}
+    ${data.note ? `<div class="meta-item" style="color:var(--amber)">⚠ ${esc(data.note)}</div>` : ''}`;
+}
+
+// ── Sample questions ─────────────────────────────────────────────────────────
+const SAMPLES = [
+  'What is this document about?',
+  'What are the key findings or conclusions?',
+  'List the main sections and their topics.',
+  'Are there any specific numbers, statistics, or dates mentioned?',
+  'What recommendations are made?',
+];
+
+function addSampleQuestions() {
+  const panel = document.getElementById('samples-panel');
+  const list  = document.getElementById('sample-list');
+  list.innerHTML = '';
+  SAMPLES.forEach(q => {
+    const div = document.createElement('div');
+    div.className = 'sample-q';
+    div.textContent = q;
+    div.addEventListener('click', () => { queryInput.value = q; runQuery(); });
+    list.appendChild(div);
+  });
+  panel.style.display = 'block';
+}
+
+// ── Helpers ─────────────────────────────────────────────────────────────────
+function hideResults() {
+  [answerCard, stepsCard, metaCard].forEach(c => c.style.display = 'none');
+  stepList.innerHTML = '';
+}
+function hideError()  { errorCard.style.display = 'none'; }
+function showError(msg) {
+  hideResults();
+  errorCard.textContent = '⚠ ' + msg;
+  errorCard.style.display = 'block';
+}
+function esc(str) {
+  return String(str)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;').replace(/'/g,'&#039;');
+}
+
+// ── Tabs ─────────────────────────────────────────────────────────────────────
+function switchTab(tab) {
+  document.querySelectorAll('.rtab').forEach(t => t.classList.toggle('active', t.dataset.tab === tab));
+  document.getElementById('results-panel').classList.toggle('hidden', tab !== 'results');
+  document.getElementById('tree-panel').classList.toggle('active', tab === 'tree');
+  if (tab === 'tree' && hasDoc && !document.getElementById('tree-content').style.display.includes('block')) {
+    loadTree();
+  }
+}
+
+// ── Tree rendering ────────────────────────────────────────────────────────────
+async function loadTree() {
+  try {
+    const res = await fetch(`${API}/api/tree`);
+    if (!res.ok) return;
+    const data = await res.json();
+    renderTree(data);
+  } catch(_) {}
+}
+
+function renderTree(data) {
+  const doc = data.document;
+  document.getElementById('tree-title').textContent = doc.title;
+  document.getElementById('tree-desc').textContent = doc.description || '';
+  const container = document.getElementById('tree-nodes');
+  container.innerHTML = '';
+
+  (doc.nodes || []).forEach(node => {
+    container.appendChild(buildNodeEl(node, false));
+  });
+
+  document.getElementById('tree-empty').style.display = 'none';
+  document.getElementById('tree-content').style.display = 'block';
+}
+
+function buildNodeEl(node, isSub) {
+  const hasChildren = node.sub_nodes && node.sub_nodes.length > 0;
+  const el = document.createElement('div');
+  el.className = isSub ? 'tree-subnode' : 'tree-node';
+
+  const headClass = isSub ? 'tree-subnode-head' : 'tree-node-head';
+  const bodyClass = isSub ? 'tree-subnode-body' : 'tree-node-body';
+
+  el.innerHTML = `
+    <div class="${headClass}" onclick="toggleTreeNode(this)">
+      ${!isSub ? `<span class="tree-node-toggle">${hasChildren ? '▶' : ' '}</span>` : ''}
+      <span class="tree-node-id">${esc(node.node_id)}</span>
+      <div class="tree-node-info">
+        <div class="tree-node-title">${esc(node.title)}</div>
+        <div class="tree-node-pages">Pages ${node.start_page}–${node.end_page}</div>
+      </div>
+    </div>
+    <div class="${bodyClass}">
+      <div class="${isSub ? '' : 'tree-node-summary'}">${esc(node.summary)}</div>
+      ${hasChildren ? `<div class="${isSub ? '' : 'tree-subnodes'}" id="sub_${esc(node.node_id)}"></div>` : ''}
+    </div>`;
+
+  if (hasChildren) {
+    const subContainer = el.querySelector(`#sub_${node.node_id}`);
+    if (subContainer) {
+      node.sub_nodes.forEach(child => subContainer.appendChild(buildNodeEl(child, true)));
+    }
+  }
+  return el;
+}
+
+function toggleTreeNode(head) {
+  const body = head.nextElementSibling;
+  if (!body) return;
+  const isOpen = body.classList.toggle('open');
+  const toggle = head.querySelector('.tree-node-toggle');
+  if (toggle) toggle.textContent = isOpen ? '▼' : '▶';
+}
+
+// ── Check existing doc on load ───────────────────────────────────────────────
+(async () => {
+  try {
+    const res = await fetch(`${API}/api/status`);
+    if (!res.ok) return;
+    const data = await res.json();
+    if (data.has_document) {
+      document.getElementById('doc-name').textContent = data.document_name;
+      document.getElementById('doc-pages').textContent = data.total_pages;
+      document.getElementById('doc-nodes').textContent = data.tree_nodes;
+      document.getElementById('doc-time').textContent = 'cached';
+      docMeta.style.display = 'block';
+      hasDoc = true;
+      queryBtn.disabled = false;
+      emptyState.style.display = 'none';
+      addSampleQuestions();
+      document.getElementById('right-tabs').style.display = 'flex';
+    }
+  } catch(_) {}
+})();
+</script>
+</body>
+</html>
